@@ -1,0 +1,49 @@
+#include "Python.h"
+typedef struct {
+        int len;
+        double *C_list;
+    } C_arr;
+
+static C_arr 
+PyListD_GetList(PyObject *self, PyObject *args) {
+    int        n, idx, isFloat, isLong;
+    double     C_list_itm;
+    PyObject   *Py_list, *Py_list_itm;
+    C_arr      C_array = { -1, NULL };
+    
+
+    if ( (PyArg_ParseTuple(args, "O", &Py_list)) && PyList_Check(Py_list) ) {
+        
+        n = PyObject_Length(Py_list);
+        C_array.len = n;
+        C_array.C_list = (double *)malloc( n*sizeof(double) );
+        
+        for(idx = 0; idx < n; idx++) {
+            Py_list_itm = PyList_GetItem(Py_list, idx);
+            isFloat     = PyFloat_Check(Py_list_itm);
+            if ( isFloat > 0 ) {
+                C_list_itm = PyFloat_AsDouble(Py_list_itm);
+                C_array.C_list[idx] = C_list_itm;
+            }
+            else {
+                PyErr_Clear();
+                isLong = PyLong_Check(Py_list_itm);
+                if (isLong) {
+                    C_list_itm = PyLong_AsDouble(Py_list_itm); 
+                    C_array.C_list[idx] = C_list_itm;
+                }
+                else{
+                    Py_DECREF(Py_list_itm);
+                    Py_DECREF(Py_list);
+                    free(C_array.C_list);
+                    return  C_array;                    
+                }
+            }
+        } 
+        printf("PyArg_Parse exiting...returning C_list\n");
+        return C_array;
+    }
+    else {
+        return C_array;
+    }
+}

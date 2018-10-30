@@ -1,0 +1,1 @@
+int *   test(int sum, int length, int counter, int * tempseries);

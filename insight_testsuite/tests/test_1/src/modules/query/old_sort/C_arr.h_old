@@ -1,0 +1,8 @@
+#ifndef C_ARR
+#define C_ARR
+
+typedef struct {
+        int len;
+        double *C_list;
+    } C_arr;
+#endif
